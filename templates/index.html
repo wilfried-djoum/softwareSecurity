@@ -48,9 +48,17 @@
 
             <button id="downloadReport" type="button" class="downloadBtn">Download Reports</button>
         </div>
-        <div id="results"></div>
     </div>
-
+    <div class="filligramme" id="filligramme"></div>
+    <div class="popUp" id="popUp">
+        <i class='bx bxs-x-circle bx-tada bx-flip-horizontal close' id="closeBtn"></i>
+        <div class="inside">
+            <i class='bx bxs-error bx-burst result'></i>
+            <p id="results">
+                Vulnerabilité détectée avec le payload azeoihsqsd
+            </p>
+        </div>
+    </div>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"
         integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ=="

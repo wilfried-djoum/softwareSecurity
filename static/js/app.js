@@ -14,8 +14,10 @@ document.getElementById('executeAttack').addEventListener('click', function () {
     // pointer-events: none;
     loader.style.display = 'block';
     btnLabel.style.display = 'none'
+
     executeAttacks.style.cursor = 'not-allowed'
     resultsDiv.innerHTML = '';
+
 
     fetch('/attack', {
         method: 'POST',
@@ -29,15 +31,35 @@ document.getElementById('executeAttack').addEventListener('click', function () {
             loader.style.display = 'none';
             btnLabel.style.display = 'block'
             executeAttacks.style.cursor = 'pointer'
+            filligramme.style.display = 'block'
+            popUp.style.display = 'block'
+            popUp.classList.add('showBounce');
             resultsDiv.innerHTML = `<strong>Résultat:</strong> ${data.Messages}`;
         })
         .catch((error) => {
             loader.style.display = 'none';
             btnLabel.style.display = 'block'
             executeAttacks.style.cursor = 'pointer'
+            filligramme.style.display = 'block'
+            popUp.style.display = 'block'
+            popUp.classList.add('showBounce');
             resultsDiv.innerHTML = `<strong>Résultat:</strong> ${data.Messages}`;
         });
 });
+
+
+const closeBtn = document.getElementById('closeBtn')
+const filligramme = document.getElementById('filligramme')
+const popUp = document.getElementById('popUp')
+
+filligramme.style.display = 'none'
+popUp.style.display = 'none'
+
+closeBtn.addEventListener('click', function () {
+    filligramme.style.display = 'none'
+    popUp.style.display = 'none'
+    popUp.classList.remove('showBounce'); // Réinitialiser l'animation
+})
 
 document.getElementById('downloadReport').addEventListener('click', function () {
     window.location.href = '/attacks';

@@ -1,5 +1,5 @@
 # Ce fichier dans lequel on ecrira les routes pour gérer les attaques et générer les rapports 
-
+import asyncio
 from flask import Blueprint, request, jsonify, render_template, send_file, current_app
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -8,9 +8,9 @@ from app import db
 import time
 import os
 from app.attacks import brute_force_attack
+from app.attacks import sql_injection_attack
 
 main = Blueprint('main', __name__)
-
 
 @main.route('/')
 def home():
@@ -32,7 +32,8 @@ def attack():
     elif attack_type == "dos":
         result_message = f"Attaque DoS sur {target_ip} exécutée."
     elif attack_type == "sqlInjection":
-        result_message = f"Injection SQL sur {target_ip} simulée."
+        # result_message = sql_injection_attack(target_ip)
+        result_message = asyncio.run(sql_injection_attack(target_ip))
     elif attack_type == "xss":
         result_message = f"Cross-Site Scripting sur {target_ip} simulé."
     else:
