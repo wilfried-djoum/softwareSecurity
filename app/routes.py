@@ -9,6 +9,8 @@ import time
 import os
 from app.attacks import brute_force_attack
 from app.attacks import sql_injection_attack
+from app.attacks import error_handling_attack
+from app.attacks import vulnerable_library_attack
 
 main = Blueprint('main', __name__)
 
@@ -36,6 +38,10 @@ def attack():
         result_message = asyncio.run(sql_injection_attack(target_ip))
     elif attack_type == "xss":
         result_message = f"Cross-Site Scripting sur {target_ip} simulé."
+    elif attack_type == "vulnerableLibrary":
+        result_message = asyncio.run(vulnerable_library_attack(target_ip))
+    elif attack_type == "errorhandling":
+        result_message = asyncio.run(error_handling_attack(target_ip))
     else:
         result_message = "Type d'attaque non reconnu."
     
