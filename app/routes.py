@@ -9,6 +9,7 @@ import time
 import os
 from app.attacks import brute_force_attack
 from app.attacks import sql_injection_attack
+from app.attacks import ddos_attack
 
 main = Blueprint('main', __name__)
 
@@ -36,6 +37,12 @@ def attack():
         result_message = asyncio.run(sql_injection_attack(target_ip))
     elif attack_type == "xss":
         result_message = f"Cross-Site Scripting sur {target_ip} simulé."
+    elif attack_type == "ddos":
+        data = request.json
+        target_url = data.get("target_url")
+        num_threads = data.get("num_threads", 500)
+        duration = data.get("duration", 20)
+        result_message = asyncio.run(ddos_attack(target_ip, num_threads, duration))
     else:
         result_message = "Type d'attaque non reconnu."
     
