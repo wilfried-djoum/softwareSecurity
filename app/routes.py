@@ -7,8 +7,12 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from app.models import Attack
 from app import db
-from app.attacks import sql_injection_attack, error_handling_attack, vulnerable_library_attack, xss_attack, xxe_attack
+import textwrap
+import requests
+from app.attacks import sql_injection_attack, error_handling_attack, vulnerable_library_attack, xss_attack, xxe_attack, rce_attack_function, phishing_attack
 from app.attacks import ddos_attack
+from app.attacks.csrf import csrf_vulnerability_scan
+from app.attacks.html_injection import html_injection
 
 main = Blueprint('main', __name__)
 
@@ -43,6 +47,33 @@ def attack():
         num_threads = data.get("num_threads", 500)
         duration = data.get("duration", 20)
         result_message = asyncio.run(ddos_attack(target_ip, num_threads, duration))
+    elif attack_type == "htmlinjection":
+        result_message = html_injection(target_ip) 
+    elif attack_type == "csrf":
+        result_message = csrf_vulnerability_scan(target_ip)
+    elif attack_type == "rce":
+        result_message = rce_attack_function(target_ip)
+    elif attack_type == "phishing":
+        malicious_url = f"{target_ip}/?redirect=http://127.0.0.1:5000/phishing/fake_register"
+    
+        try:
+            if not target_ip.startswith("http://") and not target_ip.startswith("https://"):
+                target_ip = "http://" + target_ip 
+            
+            response = requests.get(malicious_url, headers={'Host': target_ip.split('://')[1]})
+            if response.url == "http://127.0.0.1:5000/phishing/fake_register":
+                result_message = f"Vulnerability detected! The site {target_ip} is vulnerable to phishing."
+            else:
+                result_message = f"The site {target_ip} does not appear to be vulnerable to phishing via open redirect."
+        except requests.exceptions.RequestException as e:
+            result_message = f"Error while testing {target_ip}: {str(e)}"
+
+        results['message'] = result_message
+        results['malicious_url'] = malicious_url
+        result_message = jsonify(results)
+        return result_message
+
+  
     else:
         result_message = "Type d'attaque non reconnu."
 
