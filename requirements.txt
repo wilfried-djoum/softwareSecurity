@@ -5,3 +5,7 @@ requests
 beautifulsoup4
 selenium
 playwright
+matplotlib
+fpdf
+nest_asyncio
+

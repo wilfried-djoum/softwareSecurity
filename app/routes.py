@@ -1,4 +1,3 @@
-# Ce fichier dans lequel on ecrira les routes pour gérer les attaques et générer les rapports 
 import asyncio
 from flask import Blueprint, request, jsonify, render_template, send_file, current_app
 from reportlab.lib.pagesizes import letter
@@ -11,6 +10,9 @@ from app.attacks import brute_force_attack
 from app.attacks import sql_injection_attack
 from app.attacks import error_handling_attack
 from app.attacks import vulnerable_library_attack
+from app.attacks import dos_attack
+from app.attacks import xss_attack
+from app.attacks import xxe_attack
 
 main = Blueprint('main', __name__)
 
@@ -31,17 +33,18 @@ def attack():
     # implementation de la logique des attaques 
     if attack_type == "bruteForce":
        result_message = brute_force_attack(target_ip)
-    elif attack_type == "dos":
-        result_message = f"Attaque DoS sur {target_ip} exécutée."
     elif attack_type == "sqlInjection":
-        # result_message = sql_injection_attack(target_ip)
         result_message = asyncio.run(sql_injection_attack(target_ip))
     elif attack_type == "xss":
-        result_message = f"Cross-Site Scripting sur {target_ip} simulé."
+        result_message = asyncio.run(xss_attack(target_ip))
+    elif attack_type == "xxe":
+        result_message = asyncio.run(xxe_attack(target_ip))
     elif attack_type == "vulnerableLibrary":
         result_message = asyncio.run(vulnerable_library_attack(target_ip))
     elif attack_type == "errorhandling":
         result_message = asyncio.run(error_handling_attack(target_ip))
+    elif attack_type == "dos_attack":
+        result_message = asyncio.run(dos_attack(target_ip))
     else:
         result_message = "Type d'attaque non reconnu."
     

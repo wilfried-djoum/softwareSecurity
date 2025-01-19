@@ -1,6 +1,6 @@
 import requests
 
-def test_error_handling(url):
+def error_handling_attack(url):
     results = {}
     try:
         # Verify and add the scheme if necessary
