@@ -5,3 +5,5 @@ from .sql_injection import sql_injection_attack
 from .error_handling import error_handling_attack
 from .vulnerable_library import vulnerable_library_attack
 from .ddos_attack import ddos_attack
+from .rce_attack import rce_attack_function
+from .phishing import phishing_attack

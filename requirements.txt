@@ -8,5 +8,4 @@ playwright
 matplotlib
 fpdf
 nest_asyncio
-selenium
 webdriver-manager
