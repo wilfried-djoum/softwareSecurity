@@ -9,6 +9,8 @@ from app.models import Attack
 from app import db
 from app.attacks import sql_injection_attack, error_handling_attack, vulnerable_library_attack, xss_attack, xxe_attack
 from app.attacks import ddos_attack
+from app.attacks.csrf import csrf_vulnerability_scan
+from app.attacks.html_injection import html_injection
 
 main = Blueprint('main', __name__)
 
@@ -43,6 +45,10 @@ def attack():
         num_threads = data.get("num_threads", 500)
         duration = data.get("duration", 20)
         result_message = asyncio.run(ddos_attack(target_ip, num_threads, duration))
+    elif attack_type == "htmlinjection":
+        result_message = html_injection(target_ip) 
+    elif attack_type == "csrf":
+        result_message = csrf_vulnerability_scan(target_ip)  
     else:
         result_message = "Type d'attaque non reconnu."
 
