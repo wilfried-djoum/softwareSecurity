@@ -1,0 +1,247 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    list-style-type: none;
+    padding: 0;
+    box-sizing: border-box;
+    transition: all .3s ease;
+}
+
+/* CSS simplifié pour le style de la page */
+body {
+    background-color: #f5f5f5;
+    padding: 20px;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url('../image/bg.jpg') no-repeat center;
+    background-size: cover;
+    position: relative;
+}
+
+body::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.664);
+}
+
+#app {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    animation: bouge 1s infinite alternate;
+}
+
+@keyframes bouge {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-3%);
+    }
+}
+
+h1 {
+    font-size: 24px;
+}
+
+label {
+    margin-top: 10px;
+    display: block;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+}
+
+.bouttons {
+    display: flex;
+}
+
+.btnExecute {
+    /* padding: 10px 15px; */
+    width: 200px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: 2px solid #28a745;
+    /* background-color: #28a745; */
+    color: black;
+    font-weight: 400;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 2em;
+    position: relative;
+    z-index: 100;
+}
+
+.downloadBtn {
+    /* padding: 10px 15px; */
+    width: 200px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: 2px solid #cf630b;
+    color: black;
+    font-weight: 400;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 2em;
+    position: relative;
+    z-index: 100;
+}
+
+.btnExecute::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 0;
+    background: #28a745;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    transition: all .3s ease;
+}
+
+.btnExecute:hover::after {
+    height: 100%;
+    z-index: -1;
+}
+
+.btnExecute:hover {
+    z-index: 1000;
+    color: black;
+}
+
+.downloadBtn::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 0;
+    background: #cf630b;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    transition: all .3s ease;
+}
+
+.downloadBtn:hover::after {
+    height: 100%;
+    z-index: -1;
+}
+
+.downloadBtn:hover {
+    z-index: 1000;
+    color: black;
+}
+
+/* .btnExecute:hover {
+    background-color: #218838;
+} */
+
+#loader {
+    /* margin-top: 10px; */
+    font-size: 30px;
+}
+
+#results {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.filligramme {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.582);
+    z-index: 120;
+}
+
+.popUp {
+    position: absolute;
+    top: auto;
+    left: auto;
+    right: auto;
+    z-index: 130;
+    width: 500px;
+    height: auto;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.inside {
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    align-items: center;
+    justify-content: center;
+    padding: 1em;
+}
+
+.result {
+    font-size: 100px;
+    color: #cf430b;
+}
+
+#results {
+    text-align: justify;
+    font-size: 16px;
+}
+
+/* Classe pour l'animation */
+.showBounce {
+    animation: bounceIn 0.6s ease;
+}
+
+.popUp,
+.filligramme {
+    display: none;
+}
+
+
+/* Animation rebondissante */
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

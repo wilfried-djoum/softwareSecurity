@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+reportlab
+requests
+beautifulsoup4
+selenium
+playwright
