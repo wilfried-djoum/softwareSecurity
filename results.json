@@ -1,0 +1,7 @@
+{
+    "success": 514,
+    "failure": 1,
+    "errors": [
+        "('Connection aborted.', ConnectionResetError(10054, 'Une connexion existante a d\u00fb \u00eatre ferm\u00e9e par l\u2019h\u00f4te distant', None, 10054, None))"
+    ]
+}
